@@ -63,7 +63,11 @@ In the WordLemPos data we selecte textId and lemma columns to use for analysis. 
 
 ## Managing Data with Cluster and Pyspark
 
-XXX to do XXX
+Although size of the source file -the file just shows where news articles were taken- is in managable (1,2 GB approximately) our actuall data files are not. (Approximately 18 GB for US news per year and we have 20 countries). Therefore we should be able to run our codes on the cluster. 
+
+We wrote some simple scripts to construct new data files where each one is filtered for some values (for example number of websites per country) from source file. We then compared this values with those found without Spark. Both are compatible. 
+
+We learned how to run a script and get results on the cluster. Since we are planning to process our data on the cluster this knowledge will be vital for next steps in our project.
 
 # Planning
 ## Prepare and Explore Data: Until Nov 11.
