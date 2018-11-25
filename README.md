@@ -52,8 +52,6 @@ Then we created a dataframe that we can easily use for the later work.
 
 Afterwards, we get only these features per each country and do the statistical analyses of the data.
 
-XXXXX to do clean dataset
-
 ## Now Corpus Dataset Analysis
 
 In Now Corpus dataset have 5 different data file type which are Database, WordLemPoS, Text, Sources, Lexicon. We first downloaded the samples for each of these datafiles and decided to use Sources and WordLemPos since we are interested in finding topics related to each news article.      
@@ -89,14 +87,16 @@ XXX to do XXX
 ## Next Steps To Do
 ## Prepare and Explore Data: Until Dec 2.
 - Precise the topics per each country:
-  Run LDA for each country (we do it separately otherwise the words selected might be more biased per some country has more words or articles such as US). for 
-- For each article o the topic assignment.
+  Run LDA for each country (we do it separately otherwise the words selected might be more biased per some country has more words or articles such as US).  
+- For each article do the topic assignment.
 - For each country/website/time (monthly and/or yearly) find topic percentages.
 
 ## Find Correlations between Now Corpus and FactBook: Until Dec 9.
 - Find the country-wise correlations between Now Corpus and Factbook.
+- Gather analysis and correlation results.
+- Do data visualization.
 
-## Finalize and Revise the Work done: Until Dec 16.
+## Finalize and Revise the Work done for Project: Until Dec 16.
 - Finalize the project,
 - Clean, comment and revise the notebooks.
 - Create data story.
@@ -114,14 +114,9 @@ We have 3 folders:
     -  pyspark_script.py: Source data filtered on cluster with pyspark.
 - Notebooks:
     - WorldFact.ipynb : Data Exploration and Analysis for FactBook data
-    - Source_data_exploration.ipynb : Now Corpus data: Source data: Data Exploration and Analysis 
+    - Source_Data_Exploration.ipynb : Now Corpus data: Source data: Data Exploration and Analysis 
     - WordLemPos_Topic_Modelling.ipynb : Now Corpus data: WordLemPos data: Data Exploration, Analysis and LDA Topic Modelling
     - Spark_Notebook.ipynb : Initial steps to understand managing big data in spark and cluster
     
-Order of notebooks are same as above. You can start checking the notebooks with WorldFact notebook for FactBook data analysis then proceed with Source data Exploration for Now Corpus Source analysis and then continue with WordLemPos_Topic_Modelling Notebook to see how we find the topics for news. The last notebook called Spark_Notebook
+__Order of notebooks__ are same as above. You can start checking the notebooks with WorldFact notebook for FactBook data analysis then proceed with Source data Exploration for Now Corpus Source analysis and then continue with WordLemPos_Topic_Modelling Notebook to see how we find the topics for news. The last notebook called Spark_Notebook
 this notebook contains our initial steps to understand how we can run and manage the big data on cluster with pyspark. We initally tried this with Source data of Now Corpus, and compare with our previous result, for the next steps we will further use this for WordLemPos data.
-
-# Questions for TAa
-- Can we pick a specific time interval instead of using the whole now corpus dataset? If so, which approach do you think would be more interesting to pursue: limit the time by just doing the analysis for 1 year, or some selected months for each year or some selected days for each month of every year?
-- Where can we store the newly created variables for the now corpus data?
-
