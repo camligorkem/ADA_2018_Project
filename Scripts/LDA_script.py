@@ -30,8 +30,9 @@ dataSchema = StructType([
 
 spark = SparkSession.builder.getOrCreate()
 
+
 #Load the data set and drop null rows
-data = spark.read.option('delimiter', '\t').csv(path='hdfs:///user/yuecetue/16-10-us.txt', schema=dataSchema)
+data = spark.read.option('delimiter', '\t').csv(path='hdfs:///user/camli/16-10-us.txt', schema=dataSchema)
 data_all = data['textID','lemma'].na.drop()
 
 #Group by article/news ID, make a word list
@@ -47,7 +48,8 @@ more_then_3_charachters = [word for word in cv_model.vocabulary if len(word) <= 
 contains_digits = [word for word in cv_model.vocabulary if any(char.isdigit() for char in word)]
 
 #Create an extended stopword list
-stopwords = []  #Add additional stopwords in this list
+stopwords = ['time','year','make','take','first','like','also','would','share','people','']  #Add additional stopwords in this list
+
 default_stop = StopWordsRemover.loadDefaultStopWords('english')
 #Combine the four stopwords
 stopwords = stopwords + top20  + more_then_3_charachters + contains_digits + default_stop
@@ -60,7 +62,7 @@ data_all_filtered = remover.transform(data_all_g)
 cv = CountVectorizer(inputCol="filtered", outputCol="vectors")
 cvmodel = cv.fit(data_all_filtered)
 df_vect = cvmodel.transform(data_all_filtered)
-
+"""
 #Create proper input format for LDA model
 parseData = df_vect.select('textID','vectors').rdd.map(lambda x: [int(x[0]), Vectors.dense(x[1])] )
 
@@ -70,8 +72,13 @@ ldaModel = LDA.train(parseData, k=7)
 
 # Save and load model
 ldaModel.save(sc, "LDAModel")
-#sameModel = LDAModel.load(sc, "target/org/apache/spark/PythonLatentDirichletAllocationExample/LDAModel")
+"""
 
+
+ldaModel = LDAModel.load(sc, "LDAModel")
+
+
+"""
 with open ('topic_result.txt', 'w') as f:
     #Print the topics in the model
     topics = ldaModel.describeTopics(maxTermsPerTopic = 10)
@@ -81,5 +88,23 @@ with open ('topic_result.txt', 'w') as f:
         weights = topic[1]
         for n in range(len(words)):
             f.write(cvmodel.vocabulary[words[n]] + ' ' + str(weights[n])+ '\n')
+"""
+
+#Print the topics in the model
+res=[]
+topics = ldaModel.describeTopics(maxTermsPerTopic = 10)
+for x, topic in enumerate(topics):
+    res.append('topic nr: ' + str(x))
+    words = topic[0]
+    weights = topic[1]
+    for n in range(len(words)):
+        res.append(cvmodel.vocabulary[words[n]] + ' ' + str(weights[n]))
+
+#resSchema = StructType([
+#        StructField("topic_result", StringType())])
+
+topic_res = spark.createDataFrame(res, StringType())
+topic_res.coalesce(1).write.csv("hdfs:///user/camli/topic_result.txt")
+
 
 spark.stop()
