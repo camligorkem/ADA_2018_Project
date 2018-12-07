@@ -50,13 +50,21 @@ data_sample = data_all_g.sample(False, 0.1, seed=0).limit(100000)
 cv = CountVectorizer(inputCol="collect_list(lemma)", outputCol="vectors")
 cv_model = cv.fit(data_sample)
 
-#Create stopwords criterias
+exception_list =['art','job','joy','gym','law','flu','boy','guy','gay','rob','bio','war','ill',
+                    'eat','us','uk','rap','phd','man','win','die','act','ceo','cto','gen','ski','hit'
+                    'eu','pay','fan','car','web','mom','act','tax','ad','fat','cop','dna','oil','sea','ban'
+                    'sex','ice','son','jew','ram','pc','mba','bar','gas','god','net','aid','usa','spy'
+                    'spa','fee','fun','pop','dad','fbi','cia','gdp']
+
+#Create stopwords
 top30 = list(cv_model.vocabulary[0:30])
-more_then_3_charachters = [word for word in cv_model.vocabulary if len(word) <= 3]
+more_then_3_charachters = [word for word in cv_model.vocabulary if len(word) <= 3 and word not in exception_list]
 contains_digits = [word for word in cv_model.vocabulary if any(char.isdigit() for char in word)]
 
 #Create an extended stopword list
-stopwords = ['time','year','make','take','first','like','also','would','share','people','come','find','last','tell']  #Add additional stopwords in this list
+stopwords = ['time','year','make','take','first','like','also','would','share','people','come','find','last','tell'
+            'many','need','look','know','give','want','back','show','continue','without','much','more','describe','part'
+            'high','according']  #Add additional stopwords in this list
 
 default_stop = StopWordsRemover.loadDefaultStopWords('english')
 #Combine the four stopwords
@@ -77,29 +85,17 @@ parseData = df_vect.select('textID','vectors').rdd.map(lambda x: [int(x[0]), Vec
 #Train LDA model
 ldaModel = LDA.train(parseData, k=k)
 
-
 # Save and load model
 ldaModel.save(sc, "LDAModel_"+fileName+"_k"+str(k))
 
 #ldaModel = LDAModel.load(sc, "LDAModel_"+fileName+"_k"+str(k))
 
-
-"""
-with open ('topic_result.txt', 'w') as f:
-    #Print the topics in the model
-    topics = ldaModel.describeTopics(maxTermsPerTopic = 10)
-    for x, topic in enumerate(topics):
-        f.write('topic nr: ' + str(x)+ '\n')
-        words = topic[0]
-        weights = topic[1]
-        for n in range(len(words)):
-            f.write(cvmodel.vocabulary[words[n]] + ' ' + str(weights[n])+ '\n')
-"""
-
 #Print the topics in the model
 res=[]
 topics = ldaModel.describeTopics(maxTermsPerTopic = 10)
 res.append(fileName)
+res.append('k='+str(k))
+
 for x, topic in enumerate(topics):
     res.append('topic nr: ' + str(x))
     words = topic[0]
@@ -107,16 +103,7 @@ for x, topic in enumerate(topics):
     for n in range(len(words)):
         res.append(cvmodel.vocabulary[words[n]] + ' ' + str(weights[n]))
 
-#resSchema = StructType([
-#        StructField("topic_result", StringType())])
-
 topic_res = spark.createDataFrame(res, StringType())
-topic_res.coalesce(1).write.csv("hdfs:///user/"+user+"/topic_result_sample_"+fileName+"_k"+str(k))
-
-"""
-res=[fileName,k]
-topic_res = spark.createDataFrame(res, StringType())
-topic_res.coalesce(1).write.csv("hdfs:///user/"+user+"/topic_result_sample_"+fileName+"_k"+str(k))
-"""
+topic_res.coalesce(1).write.csv("hdfs:///user/"+user+"/topics_"+fileName+"_k"+str(k))
 
 spark.stop()
