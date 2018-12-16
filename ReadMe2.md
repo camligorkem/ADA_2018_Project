@@ -61,60 +61,85 @@ Then we created a dataframe including the country names as columns and each fact
 
 ## Now Corpus Dataset Analysis
 
-In Now Corpus dataset have 5 different data file type which are Database, WordLemPoS, Text, Sources, Lexicon. We first downloaded the samples for each of these datafiles and decided to use Sources and WordLemPos since we are interested in finding topics related to each news article.      
+In Now Corpus dataset have 5 different data file type which are Database, WordLemPoS, Text, Sources, Lexicon. We first downloaded the samples for each of these datafiles and examined which ones are relevant for our research questions. We decided to use Source Data file including each article's source website, source link, word counts etc. 
 
-In the Source file we use all the 7 attributes which are textId, #words, date, country, website, url and title.
-Since the 2 source data files together has managable size we ran them on the local with the Source_data_exploration notebook. We answered some crucial question about data to see how the news article distributed around country, websites etc. Also, we checked if we can find the article topics based on URL, however the % of found topics were really low around 30%, therefore we decided to go with a different approach and run LDA to find the topics on article text in order to do that we use WordLemPos data.     
+In the Source Data, we use all the 7 attributes which are textId, #words, date, country, website, url and title.
+Since the 2 source data files together has managable size we ran them on the local with the Source_data_exploration notebook. We answered some crucial question about data to see how the news article distributed around country, websites etc. We also checked if we can find the article topics based on URL. We tried this approach to check if the urls already including the topic of the articles or not. Unfortunately, the percentage of found topics were really low around 30%. 
+Therefore, we decided to go with a different approach.
 
-In the WordLemPos data we selecte textId and lemma columns to use for analysis. Instead of using the raw text data from each article, what we did is to use the lemma column from the WordLemPos data, they were already lemmatized and stemmed so it eased the preprocessing part for us. What we did next clean the data numbers and specific characters, delete some stopwords and unnecessary words, create dictionary and doc2bow that has for each article words and their corresponding count. Then, we ran the LDA data model to find 7 topics (we did a few trials with less and more topics numbers but thought for now 7 returns good results nor too geneal neither too specific.). For now, we ran the results on 1 country:US, 1 month data to see the results are meaningful. As next step we will apply this approach to every 20 country for the last few years data.
+In our main approach, we decided to use WordLemPos Data since it includes each article's word list and run LDA to find the news topics for each country data. We selected LDA since it was one to newest state of the art algorithm in topic finding in text data. In the WordLemPos data we selected textId and lemma columns to use for analysis instead of using the raw text data from each article. Lemma columns were already lemmatized and stemmed.
+
+Our further now corpus data set analysis composed of two parts: 
+1) Source data anaylsis to see source distribitions and word counts
+2) Topic Findng with LDA
+
 
 ### Source Data Analysis
+In source data analysis we did analysis for full data of all years, then we also did the analysis for articles and sources we used in the selected year interval. Details of these results can be seen in the website of our project. 
+In general we checked from how many unique website resources, the news articles are collected. How many articles are provided for each country. We observed that number of articles are not equally distributed, US has the more articles compared to other countrie and the least number of articles belong to Tanzania with 15848 articles.
+In average countries has around 306608 articles. We also explored the total number of words in articles per country. US again has the most word count which makes sense since they have more articles collected. Overall, for all years for each country we have at least 8 million of words collected.
+We also explore the article counts per website to understand if the articles collected evenly. Howerver, some websites such as Times of India, Telegraph.co.uk has more articles collected ompared to other resources. Therefore, one needs to consider this fact while interpreting the results.
 
 ### Topic Finding with LDA
+In natural language processing, latent Dirichlet allocation (LDA) is a generative statistical model that allows sets of observations to be explained by unobserved groups that explain why some parts of the data are similar. For example, if observations are words collected into documents, it posits that each document is a mixture of a small number of topics and that each word's presence is attributable to one of the document's topics. LDA is an example of a topic model.(check https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation for the description).
+
+In order to use this methodology in our project, we  first had to provide a clean wordlist of articles by doing data preparation and noise elimination. Then we contructed LDA model, by determining right parameters for a logical clustering of the data resulting with meaningfull news topics. During this process, several parameters are tested and tuned iteratively by running the LDA on clusters with different parametric combinations. In addition to these steps we also had to discover which lda algorithm in spark is useful and matches our needs, and with which optimizer we can get the best results. 
+Each of these steps are explained in detail in the following subsections.
 
 #### Data Preparation
-
+Data preparation step includes time interval selection, sampling and noise elimination for the news data.
 ##### Time Interval Selection 
-First we tried 3 years data then 2 and 1 year data.
-Computational time was so high like 40 hours in LDA.
-We sampled the data of 1 year as well.
-* 24 saat surdu 
-sample yaptik 8 e dustu. 
+In time interval selection process, we had to take into account the up to date provided country facts from factbook data, computational time of LDA and size of the now corpus data. 
+ 
+After analysing the data of factbook we observed that most of the values belong to 2016, in order to correlate fact with news  we decided to use the recent news data for further analysis. 
+First we tried 3 and 2 years' news data but computational time was so high (around 40 hours) in LDA. Then we tried 1 year data.
+The last year data of Now Corpus belongs to 2016 but does not include last two months. In order to eliminate month bias in the data results we used last 12 months of the data set corresponds to the data published between November 2015 and October 2016.
+This data even was very log to process within the given time interval of our project (each 24 hour). Therefore we sampled our data by selecting random articles through the selected year interval and time decreased to 8 hours.
+We also paralelized the process to dicrease the run time.
 
-Based on our RQs we extracted last year.
+##### Noise Elimination Steps
 
-##### Noise elimination steps
+We cleaned the data from numbers and specific characters then deleted stopwords by using two different already existing lists.
+However, in the results there were several words that are not contributing to determine a specific topic per cluster. Afterwards, we applied following steps to make words list data cleaner. Some of the steps are applied by doing several LDA iterations and checking most frequent word lists of each clusters. 
+
 1) Elimination of Stopwords Using already existing spark ml library default stopwordlist.
-2) Iteractive elimination of unrelated words that are not contributing to the topic selection (also, share, many, like etc.)
-We did several clustering iterations and check the resulting most frequent/common words for each topic and iteratively eliminated unrelated words. 
+2) Iterative elimination of unrelated words that are not contributing to the topic selection (such as :also, share, many, like)
+We did several LDA clustering iterations and check the resulting most frequent/common words for each topic and iteratively eliminated unrelated words. 
 3) Eliminating digits
-4) Eliminated less than 3 letter words
-5) Iteratively selecting sigma value for tail cutting to create most freq and least freq extra words.
-6) Adding back important 2/3 letter word list
-
-
-##### Extra words elimination through creating extralist with iterations
+4) Eliminating less than 3 letter words: this step is used in several previous studies on natural language processing. 
+5) Adding back important 2/3 letter word list: we were concerned about eliminating useful important words potantially contributes to the clustering such as art, man, gun, war, eu, us, win, car. Therefore, we decided to create a 2 -3 letter word list to put back to the data. 
+6) Iteratively selecting sigma value for tail cutting to create most freq and least freq extra words: In the previous studies on nlp, in order to eliminate noise, most frequent and least frequent words are deleted from the data sets. Since we did not want to eliminate some X percent of the data randomly we used a more scientific methodology. In nlp, the word distribution is assumed as gaussian, in order to cut the tails of this distribution, we decided to use sigma value. We cutted the tails and keep the data within the borders of 1 sigma, 1.5 sigma, and 2 sigma from each side (each side of the graph: to the left x sigma and to the right x sigma),that corresponds to %95.4, %86.6, and %68.3 of the data respectively. In order to see the visual version of this check the following link:
+https://thecuriousastronomer.wordpress.com/2014/06/26/what-does-a-1-sigma-3-sigma-or-5-sigma-detection-mean/
+Then we did LDA with the combination of these 3 sigma values and different cluster(k) numbers. At the end we got the best results from using 2 sigma.
+ 
 
 #### LDA Model Construction 
+In order to get relevant most frequent words for each clusters and having meaningfull topics we had to decide 
+1)how many clusters should be determined in the model
+2)which sample size is best to represent the data
+3)which sigma value should be selected for most/least frequent word election for cleaning
 
+In order to determine these 3 values to create our final model we run the LDA with combinations of different values of each number. Then we checked the cluster results and thought about possible topics that can be determined from each cluster. We selected the values resulting with the most relevant, meaningful and distinguishable clusters of frequent words. 
 
-##### Selecting number of cluster (k) to select  proper number of meaningful topics- 
-3-4-5 cok yakin cikti
-then we tried 7-10-13 
-10-13 were not distinguishable
+We run LDA for each country seperately. The reason behind this approach is following: Each country speaks differently about on topic even the consept is the same. For instance if the Topic is Sports, Canada talks about Hokey while India talks about Cricket. Correspondingly the name of the sports celebrities changes as well. Similarly, if the topic is politics in India we can see the religion related words while in US we see Trump. However, if we see Trump word in another country the word belongs to International topic. Therefore, running the model on a mixed country data may result in either very undistinguishable clusters with very general words or wrong topic assignments.
 
-##### Sample size selection - %10 %20 **%25 denendi
+##### Selecting number of cluster (k) to select  proper number of meaningful topics
+We first tried 3-4-5 to have similar topics for each country but the most frequent words in the clusters were very close. 
+Then we tried 7-10-13  number of cluster and selected 7 since 10-13 were not distinguishable while 7 gives the logical news topics. 
+
+##### Sample size selection 
+As we discussed in the Time Interval Selection section, we decided to sample the data. In order to determine which percentage of the data will be sampled we iteratively sampled and tested %10, %20 and %25 of the data. The best result is btained from %25 sampling.
 
 ##### Selecting sigma value for tail cutting
-data noise orani belirledik 
-finding most logical topics and better clustering by using sigma
+In order to find most logical topics and better clustering by cutting most frequenct and least frequent words we tried different sigma values to cut the tails of our word data distribution for each country. Best result is obtained with the k=7, sampling: %25 and using sigma: 2 which corresponds to %95.4 of our sampled word data.
 
 #### LDA Model Selection 
-mllib clustering lda , no topic assignment function , problematic paralalization
-*ml.clustering lda,  paralalized, faster topic assignment after clustering is available using transform function
-
-Final model selected according to lower perplexity score ve meaningfull topic dagilimina baktik
+We tried two different lda library: mllib clustering lda and ml.clustering lda.
+mllib clustering lda was used and we reognized that after clustering it doe not provide a function for cluster assignment for each article. It was also problematic in paralelization.
+ml.clustering lda improved our computational time by paralelization and it provides easier topic assignment after clustering using transform function.
+Second model selected according to lower perplexity score ve meaningfull topic dagilimina baktik
 Log likehoods are also taken into account.
+
 ##### LDA optimizer selection
 
 Each optimizer in lda model provides different list of most frequent word list we selected most meaningfull. **EM optimizer.
@@ -128,9 +153,14 @@ Also em has better perplexity score.
 -pearson spearman
 
 
+## Contributions
+Gorkem Camli: choice of datasets, creating the plan for each milestone, exploratory data analysis and attribute description on Now Corpus Data, generating interactive graphs,generating interactive maps, analysis of final results, creating a website that also serves as a platform for the data story, development of project topic, commenting the code, writing the explanations in the notebook, writing the data story, LDA model construction, LDA code implementation and iterative run on clusters,topic selection for each country, correlation analysis. 
 
+Arzu Guneysu Ozgur: creating the plan for each milestone,exploratory data analysis and attribute description on Factbook data, aggregating data and plotting, analysis of final results,data preparation,sigma value use in data cleaning,generating interactive maps, creating content for the website, commenting the code, writing the explanations in the notebook,writing the data story,LDA model construction, development of project topic,topic selection for each country, correlation analysis.
 
-# Planning
+Ezgi Yuceturk: choice of datasets,creating the plan for each milestone,LDA model construction, LDA code implementation and iterative run on clusters,code implementation for managing the big data on spark,analysis of final results, developing host website for the final presentation,development of project topic, commenting the code, writing the explanations in the notebook, writing the data story, topic selection for each country, topic assignmentcorrelation analysis.
+
+# Planning for each Milestone
 ## Prepare and Explore Data: Until Nov 11.
 - Understand how to manage the data. 
 - Decide on how to filter the now corpus to have a managable data size.
