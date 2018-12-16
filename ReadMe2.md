@@ -29,14 +29,15 @@ The data is in txt format but th data size is too large, it is around 5.9 millio
 We can enrich the dataset by doing following:
 - By using the source data we can group the news by country and time. 
 - By using the title and url information of the news we can infer the topic of the newspaper (most cases url contains sports, healthcare, tech words in the urls).
-- By using the wlp data we can find the frequency of the words in the text.
+- By using the wlp data we can find the Topics of the articles.
 
 ## World Factbook
 
 World Factbook contains the daa about each country profiles collected by CIA. The data is open source and can be obtained from [this link](https://github.com/factbook/factbook.json) as a json format. We are only interested in 20 countries therefore, we will use only the countries in which we have news article available. Also, the country profiles are in-depth, we will choose key information such as population, age profile, sex ratio, and other socio-economic informations. 
 
 # Data Analysis
-We did two data exploration for each dataset separately.
+
+Our data analysis consists of three main parts: Analysis of factbook data, analysis of now corpus data and correlation of two data. In the first part, we determined and extracted the relevant facts for each countries. In the second part we determined topics for news and get the tpic distribution for each countries news articles. At the last part we checked if there are some correlations between the facts and toic distributions.
 
 ## FactBook Dataset Analysis
 
@@ -48,26 +49,26 @@ For each country, Factbook provides us more than 100 facts under the different m
 First we read all the given facts under the each topic on the website (https://www.cia.gov/library/publications/the-world-factbook/). We decided on the useful features of the data that we might possibly find some correlation between the news topics that are extracted from news data. 
 
 The following facts are selected to compare with the now corpus data: 
-1) People and Society: Population, Age structure, Median age, Population growth rate, Birth rate, Death rate, Net migration rate, Sex ratio, Life expectancy at birth, Religions, Ethnic groups 
-2) Economy: GDP - per capita (PPP), Unemployment rate, Inflation rate (consumer prices), Population below poverty line 
-3) Energy: Electricity - from other renewable source, Carbon dioxide emissions from consumption of energy
-4) Communications: Internet users
-5) Government: Country name
-6) Geography: Geographic coordinates, Natural hazards, Environment - current issues
+**1) People and Society:** Population, Age structure, Median age, Population growth rate, Birth rate, Death rate, Net migration rate, Sex ratio, Life expectancy at birth, Religions, Ethnic groups 
+**2) Economy:** GDP - per capita (PPP), Unemployment rate, Inflation rate (consumer prices), Population below poverty line 
+**3) Energy:** Electricity - from other renewable source, Carbon dioxide emissions from consumption of energy
+**4) Communications:** Internet users
+**5) Government:** Country name
+**6) Geography:** Geographic coordinates, Natural hazards, Environment - current issues
         
 We extracted the selected features for our 20 specific countries and did some preprocessing to clean the data. These preprocessing includes text data cleaning, splitting text and extracting the only usefull information needed. We also checked which facts include up to date data and which data have clear comparible usefull information. During this process, we decided not to use Natural Hazards feature since the effect, frequency and size of the hazards are not comparible between countries. Our second concern was that distribution of the different hazards are very varied and for 20 countries does not seem possible to do correlation. Similarly, Environmental Issues data also does not provide the degree of the problem and creates similar analysis issues. We also decided to exclude Religious, Population below poverty line and Ethnic groups data since the latest data belongs to the years of 2000-2016 range changing in each countries. For the rest of the facts, we selected the latest date information mostly belongs to 2016. Some of the facts includes values per population, per gender or per age group. In these facts we mostly selected values for overall population.  
 
-Then we created a dataframe including the country names as columns and each fact added as columns. All rate, percentage and numbers in texts converted to float. We plotted all the facts for each countries in /Notebooks/WorldFact.ipynb.
+Then we created a dataframe including the country names as columns and each fact added as columns. All rate, percentage and numbers in texts converted to float. We plotted all the facts for each countries in /**Notebooks/WorldFact.ipynb.**
 
 ## Now Corpus Dataset Analysis
 
 In Now Corpus dataset have 5 different data file type which are Database, WordLemPoS, Text, Sources, Lexicon. We first downloaded the samples for each of these datafiles and examined which ones are relevant for our research questions. We decided to use Source Data file including each article's source website, source link, word counts etc. 
 
-In the Source Data, we use all the 7 attributes which are textId, #words, date, country, website, url and title.
+In **the Source Data**, we use all the 7 attributes which are textId, #words, date, country, website, url and title.
 Since the 2 source data files together has managable size we ran them on the local with the Source_data_exploration notebook. We answered some crucial question about data to see how the news article distributed around country, websites etc. We also checked if we can find the article topics based on URL. We tried this approach to check if the urls already including the topic of the articles or not. Unfortunately, the percentage of found topics were really low around 30%. 
 Therefore, we decided to go with a different approach.
 
-In our main approach, we decided to use WordLemPos Data since it includes each article's word list and run LDA to find the news topics for each country data. We selected LDA since it was one to newest state of the art algorithm in topic finding in text data. In the WordLemPos data we selected textId and lemma columns to use for analysis instead of using the raw text data from each article. Lemma columns were already lemmatized and stemmed.
+In our main approach, we decided to use **WordLemPos Data** since it includes each article's word list and run LDA to find the news topics for each country data. We selected LDA since it was one to newest state of the art algorithm in topic finding in text data. In the WordLemPos data we selected textId and lemma columns to use for analysis instead of using the raw text data from each article. Lemma columns were already lemmatized and stemmed.
 
 Our further now corpus data set analysis composed of two parts: 
 1) Source data anaylsis to see source distribitions and word counts
@@ -115,9 +116,9 @@ Then we did LDA with the combination of these 3 sigma values and different clust
 
 #### LDA Model Construction 
 In order to get relevant most frequent words for each clusters and having meaningfull topics we had to decide 
-1)how many clusters should be determined in the model
-2)which sample size is best to represent the data
-3)which sigma value should be selected for most/least frequent word election for cleaning
+**1)how many clusters should be determined in the model**
+**2)which sample size is best to represent the data**
+**3)which sigma value should be selected for most/least frequent word election for cleaning**
 
 In order to determine these 3 values to create our final model we run the LDA with combinations of different values of each number. Then we checked the cluster results and thought about possible topics that can be determined from each cluster. We selected the values resulting with the most relevant, meaningful and distinguishable clusters of frequent words. 
 
@@ -144,7 +145,7 @@ There are two optimizer we tried in LDA model: EM optimizer and Online optimizer
 Each optimizer provides different list of most frequent word list and we selected the one giving most meaningfull most frequent words list for each cluster and the one with better **perplexity score** which is **EM optimizer**. 
 
 
-After selecting the best model we assigned corresponding topic names to the clusters and for each country we created topic distribution by counting article number on belonging to each topic. These distributions can be seen in our website with interactive pie charts showing percentage of each topic per country. We ended up following news topics: ENVIRONMENT/ENERGY, INTERNATIONAL, POLITICS, SPORTS, TECHNOLOGY/SCIENCE/SOCIAL MEDIA, SOCIAL_LIFE/DAILY, ENTERTAINMENT/ART/MAGAZINE, COMPANY/BUSINESS, ECONOMY, POLICE/ACCIDENT/VIOLENCE, LEGAL/LAW and HEALTH/MEDICAL.
+After selecting the best model we assigned corresponding topic names to the clusters and for each country we created topic distribution by counting article number on belonging to each topic. These distributions can be seen in our website with interactive pie charts showing percentage of each topic per country. We ended up following news topics: **ENVIRONMENT/ENERGY, INTERNATIONAL, POLITICS, SPORTS, TECHNOLOGY/SCIENCE/SOCIAL MEDIA, SOCIAL_LIFE/DAILY, ENTERTAINMENT/ART/MAGAZINE, COMPANY/BUSINESS, ECONOMY, POLICE/ACCIDENT/VIOLENCE, LEGAL/LAW and HEALTH/MEDICAL.**
 
 
 
@@ -157,11 +158,11 @@ We interpreted these results and published on our website. But the results shoul
 We also checked the results by grouping the different facts data into groups of countries such as countries having high, medium and low carbondioxide emission rate. This ranking approach did not change our significant correlation results. 
 
 ## Contributions
-Gorkem Camli: choice of datasets, creating the plan for each milestone, exploratory data analysis and attribute description on Now Corpus Data, generating interactive graphs,generating interactive maps, analysis of final results, creating a website that also serves as a platform for the data story, development of project topic, commenting the code, writing the explanations in the notebook, writing the data story, LDA model construction, LDA code implementation and iterative run on clusters,topic selection for each country, correlation analysis. 
+**Gorkem Camli:** choice of datasets, creating the plan for each milestone, exploratory data analysis and attribute description on Now Corpus Data, generating interactive graphs,generating interactive maps, analysis of final results, creating a website that also serves as a platform for the data story, development of project topic, commenting the code, writing the explanations in the notebook, writing the data story, LDA model construction, LDA code implementation and iterative run on clusters,topic selection for each country, correlation analysis. 
 
-Arzu Guneysu Ozgur: creating the plan for each milestone,exploratory data analysis and attribute description on Factbook data, aggregating data and plotting, analysis of final results,data preparation,sigma value use in data cleaning,generating interactive maps, creating content for the website, commenting the code, writing the explanations in the notebook,writing the data story,LDA model construction, development of project topic,topic selection for each country, correlation analysis.
+**Arzu Guneysu Ozgur:** creating the plan for each milestone,exploratory data analysis and attribute description on Factbook data, aggregating data and plotting, analysis of final results,data preparation,sigma value use in data cleaning,generating interactive maps, creating content for the website, commenting the code, writing the explanations in the notebook,writing the data story,LDA model construction, development of project topic,topic selection for each country, correlation analysis.
 
-Ezgi Yuceturk: choice of datasets,creating the plan for each milestone,LDA model construction, LDA code implementation and iterative run on clusters,code implementation for managing the big data on spark,analysis of final results, developing host website for the final presentation,development of project topic, commenting the code, writing the explanations in the notebook, writing the data story, topic selection for each country, topic assignmentcorrelation analysis.
+**Ezgi Yuceturk:** choice of datasets,creating the plan for each milestone,LDA model construction, LDA code implementation and iterative run on clusters,code implementation for managing the big data on spark,analysis of final results, developing host website for the final presentation,development of project topic, commenting the code, writing the explanations in the notebook, writing the data story, topic selection for each country, topic assignmentcorrelation analysis.
 
 # Planning for each Milestone
 ## Prepare and Explore Data: Until Nov 11.
