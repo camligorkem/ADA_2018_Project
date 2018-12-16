@@ -160,7 +160,7 @@ We also checked the results by grouping the different facts data into groups of 
 
 **Arzu Guneysu Ozgur:** creating the plan for each milestone,exploratory data analysis and attribute description on Factbook data, aggregating data and plotting, analysis of final results,data preparation,sigma value use in data cleaning,generating interactive maps, creating content for the website, commenting the code, writing the explanations in the notebook,writing the data story,LDA model construction, development of project topic,topic selection for each country, correlation analysis.
 
-**Ezgi Yuceturk:** choice of datasets,creating the plan for each milestone,LDA model construction, LDA code implementation and iterative run on clusters,code implementation for managing the big data on spark,analysis of final results, developing host website for the final presentation,development of project topic, commenting the code, writing the explanations in the notebook, writing the data story, topic selection for each country, topic assignmentcorrelation analysis.
+**Ezgi Yuceturk:** choice of datasets,creating the plan for each milestone, explatory data analysis with spark, LDA model construction and selection, LDA code implementation and iterative run on clusters,code implementation for managing the big data on spark,analysis of final results, developing host website for the final presentation, development of project topic, commenting the code, writing the explanations in the notebook, writing the data story, topic selection for each country, topic assignment for LDA results, correlation analysis, most frequent word extraction.
 
 # Planning for each Milestone
 ## Prepare and Explore Data: Until Nov 11.
@@ -203,16 +203,27 @@ This project's github repository folder structure explained below:
 
 We have 3 folders:
 - Data:
-    In this folder, we only included the data we have extracted from FactBook dataset for 20 countries and the parquet data that we created for the analysis.   
+    In this folder, we included the data we have extracted from FactBook dataset for 20 countries, the parquet data that we created for preliminary analysis. 
+    - Counrty: folder contains news-topic information for sampled news adn their assigned topic for each country
     - Factbook.json : Factbook data from CIA for 20 countries
     - data.parquet folder: Query results saved from pyspark_script.py results
 - Scripts:
     -  pyspark_script.py: Source data filtered on cluster with pyspark.
+    -  LDA_script_params.py:	Run LDA script with params (k, sigma etc)
+    -  LDA_script_sample.py:	Improve version LDA script (include sampling)
+    -  create_LDA_Model.py: For model selection
+    -  yet_another_LDA.py: Final version
 - Notebooks:
     - WorldFact.ipynb : Data Exploration and Analysis for FactBook data
     - Source_Data_Exploration.ipynb : Now Corpus data: Source data: Data Exploration and Analysis 
     - WordLemPos_Topic_Modelling.ipynb : Now Corpus data: WordLemPos data: Data Exploration, Analysis and LDA Topic Modelling
     - Spark_Notebook.ipynb : Initial steps to understand managing big data in spark and cluster
+    - Data_Analysis.ipynb	: Correlations of two datasets, answers to research questions(left)
+    - Topic_Assignment.ipynb :	Human understandable topic assignment to documents clustered by LDA Model
+ - Plots: Interactive plots created for website
+ - LDAResult: 
+    - all-pre-results: results found during model selecting and hyper parameter tuning for models 
+    - for all countries: LDA model, topic distributions, document assignments, topics and words can be found along with perplexity scores and log likelihood results.
     
-__Order of notebooks__ are same as above. You can start checking the notebooks with WorldFact notebook for FactBook data analysis then proceed with Source data Exploration for Now Corpus Source analysis and then continue with WordLemPos_Topic_Modelling Notebook to see how we find the topics for news. The last notebook called Spark_Notebook
-this notebook contains our initial steps to understand how we can run and manage the big data on cluster with pyspark. We initally tried this with Source data of Now Corpus, and compare with our previous result, for the next steps we will further use this for WordLemPos data.
+__Order of notebooks__ are same as above. You can start checking the notebooks with WorldFact notebook for FactBook data analysis then proceed with Source data Exploration for Now Corpus Source analysis and then continue with WordLemPos_Topic_Modelling. After them, Topic_Assignment and finally Data_Analysis Notebook to see how we discovered correlations.
+Spark_Notebook contains our initial steps to understand how we can run and manage the big data on cluster with pyspark. We initally tried this with Source data of Now Corpus, for later this notebook is turned into scripts.
