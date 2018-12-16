@@ -11,6 +11,7 @@ In the newspaper and magazine articles we cover more than events, we share what 
 # Research questions
 ## Contents of the News
 - What are the main topics of the published news? (tech, politics, sports, etc.)
+- What are the distributions of articles over country and time?
 - What are the distributions of these topics over country and time?
 - What are some mostly used words in the countries topics? 
 
