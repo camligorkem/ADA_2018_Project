@@ -5,20 +5,18 @@
 > “A good newspaper is a nation talking to itself.” \
 >  Arthur Miller
 
-In the newspaper and magazine articles we cover more than events, we share what we are doing, what we are interested in and what matters to us as a society. Our aim in this project is to see how the news content changes for countries over time and is there a connection between country profiles and the news published. Our motivation behind this project is to understand, the underlying profile of the published news content: the topics of the news, its tone, most commonly used words and whether these information change between countries or time. Do the news become more global or they manage to conserve some trends from the country they are published? We aim to see if country specific information and published news are somehow correlated or a good newspaper/article is now a **_world_** talking to itself? We will use the News on the Web dataset more specifically, Now corpus data and we will gather the country profiles from The World Factbook data [[1]](https://www.cia.gov/library/publications/the-world-factbook/).     
+In the newspaper and magazine articles we cover more than events, we share what we are doing, what we are interested in and what matters to us as a society. Our aim in this project is to see how the news content changes for countries over time and is there a connection between country profiles and the news published. Our motivation behind this project is to understand, the underlying profile of the published news content: the topics of the news, its tone, most commonly used words and whether these information change between countries. Do the news become more global or they manage to conserve some trends from the country they are published? We aim to see if country specific information and published news are somehow correlated or a good newspaper/article is now a **_world_** talking to itself? We use the News on the Web dataset more specifically, Now corpus data and we gather the country profiles from The World Factbook data [[1]](https://www.cia.gov/library/publications/the-world-factbook/).     
 
 
 # Research questions
 ## Contents of the News
 - What are the main topics of the published news? (tech, politics, sports, etc.)
 - What are the distributions of these topics over country and time?
-XXXXTODOXXXXX- What are some mostly used words in the countries/topic? 
+- What are some mostly used words in the countries topics? 
 
 ## News and Country Profiles
 - Is there some trends or patterns between news articles and country profiles?
   - Are countries having X attribute/fact, have more news on topic Y?
-XXXXTODOXXXX  - Are countries having X attribute/fact, use Z common specific words more often?
-XXXXTODOXXXX  - If there is some patterns or correlation, do they change over time?
 
 # Dataset
 ## News on the Web: Now Corpus
@@ -33,7 +31,7 @@ We can enrich the dataset by doing following:
 
 ## World Factbook
 
-World Factbook contains the daa about each country profiles collected by CIA. The data is open source and can be obtained from [this link](https://github.com/factbook/factbook.json) as a json format. We are only interested in 20 countries therefore, we will use only the countries in which we have news article available. Also, the country profiles are in-depth, we will choose key information such as population, age profile, sex ratio, and other socio-economic informations. 
+World Factbook contains the data about each country profiles collected by CIA. The data is open source and can be obtained from [this link](https://github.com/factbook/factbook.json) as a json format. We are only interested in 20 countries therefore, we use only the countries in which we have news article available. Also, the country profiles are in-depth, wecchoose key information such as population, age profile, sex ratio, and other socio-economic informations. 
 
 # Data Analysis
 
