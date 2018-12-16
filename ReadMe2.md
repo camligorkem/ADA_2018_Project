@@ -121,37 +121,40 @@ In order to get relevant most frequent words for each clusters and having meanin
 
 In order to determine these 3 values to create our final model we run the LDA with combinations of different values of each number. Then we checked the cluster results and thought about possible topics that can be determined from each cluster. We selected the values resulting with the most relevant, meaningful and distinguishable clusters of frequent words. 
 
-We run LDA for each country seperately. The reason behind this approach is following: Each country speaks differently about on topic even the consept is the same. For instance if the Topic is Sports, Canada talks about Hokey while India talks about Cricket. Correspondingly the name of the sports celebrities changes as well. Similarly, if the topic is politics in India we can see the religion related words while in US we see Trump. However, if we see Trump word in another country the word belongs to International topic. Therefore, running the model on a mixed country data may result in either very undistinguishable clusters with very general words or wrong topic assignments.
+We run LDA for each country seperately. The reason behind this approach is following: Each country speaks differently about on a topic even the consept is the same. For instance if the Topic is Sports, Canada talks about Hokey while India talks about Cricket. Correspondingly the name of the sports celebrities changes as well. Similarly, if the topic is politics in India we can see the religion related words while in US we see Trump. However, if we see Trump word in another country the word belongs to International topic. Therefore, running the model on a mixed country data may result in either very undistinguishable clusters with very general words or wrong topic assignments.
 
 ##### Selecting number of cluster (k) to select  proper number of meaningful topics
 We first tried 3-4-5 to have similar topics for each country but the most frequent words in the clusters were very close. 
-Then we tried 7-10-13  number of cluster and selected 7 since 10-13 were not distinguishable while 7 gives the logical news topics. 
+Then we tried 7-10-13  number of cluster and selected 7 since 10-13 were not distinguishable while **k=7** gives the logical news topics. 
 
 ##### Sample size selection 
-As we discussed in the Time Interval Selection section, we decided to sample the data. In order to determine which percentage of the data will be sampled we iteratively sampled and tested %10, %20 and %25 of the data. The best result is btained from %25 sampling.
+As we discussed in the Time Interval Selection section, we decided to sample the data. In order to determine which percentage of the data will be sampled we iteratively sampled and tested %10, %20 and %25 of the data. The best result is obtained from **%25 sampling**.
 
 ##### Selecting sigma value for tail cutting
-In order to find most logical topics and better clustering by cutting most frequenct and least frequent words we tried different sigma values to cut the tails of our word data distribution for each country. Best result is obtained with the k=7, sampling: %25 and using sigma: 2 which corresponds to %95.4 of our sampled word data.
+In order to find most logical topics and better clustering by cutting most frequenct and least frequent words we tried different sigma values to cut the tails of our word data distribution for each country. Best result is obtained with the k=7, sampling: %25 and using sigma: 2 which corresponds to **%95.4** of our sampled word data.
 
 #### LDA Model Selection 
 We tried two different lda library: mllib clustering lda and ml.clustering lda.
 mllib clustering lda was used and we reognized that after clustering it doe not provide a function for cluster assignment for each article. It was also problematic in paralelization.
-ml.clustering lda improved our computational time by paralelization and it provides easier topic assignment after clustering using transform function.
-Second model selected according to lower perplexity score ve meaningfull topic dagilimina baktik
-Log likehoods are also taken into account.
+**ml.clustering lda** improved our computational time by paralelization and it provides easier topic assignment after clustering using transform function. Second model selected according to lower perplexity score and meaningfull topic distribution.
+**Topic distribution** is the term we used for distribution of a countries articles among clusters. In here we checked the following: when we have  k clusters and meaningfull topics, after assigning each article to one of these k clusters do we have a proper distribution of articles among the clusters. In here, an example of not proper distribution can be like that : we have 7 clusters 0,1,2,3,4,5,6 and we have 5670, 300, 0, 30, 20, 5, 4 number of articles respectively. In this scenario, we can easily say that one cluster dominates and it is not a good distribution. We selected the model giving a meaningful topic distribution for articles among the clusters. During model selection log likehoods are also taken into account.
 
 ##### LDA optimizer selection
+There are two optimizer we tried in LDA model: EM optimizer and Online optimizer.
+Each optimizer provides different list of most frequent word list and we selected the one giving most meaningfull most frequent words list for each cluster and the one with better **perplexity score** which is **EM optimizer**. 
 
-Each optimizer in lda model provides different list of most frequent word list we selected most meaningfull. **EM optimizer.
-Online optimizer
 
-Also em has better perplexity score.
+After selecting the best model we assigned corresponding topic names to the clusters and for each country we created topic distribution by counting article number on belonging to each topic. These distributions can be seen in our website with interactive pie charts showing percentage of each topic per country. We ended up following news topics: ENVIRONMENT/ENERGY, INTERNATIONAL, POLITICS, SPORTS, TECHNOLOGY/SCIENCE/SOCIAL MEDIA, SOCIAL_LIFE/DAILY, ENTERTAINMENT/ART/MAGAZINE, COMPANY/BUSINESS, ECONOMY, POLICE/ACCIDENT/VIOLENCE, LEGAL/LAW and HEALTH/MEDICAL.
+
 
 
 ## Correlation of Two Data
--grouping
--pearson spearman
+After having the distributions of topics  and different facts for each country we checked the correlation. We used both pearsonr and spearman correlations. Since our research questions were focusing on a monotonic relationship between topic distribution on media coverage and facts we decided to publish the results with Spearman correlation.
 
+We created heatmap for the correlations and considered only the relations with higher than 0.25 and lower than -0.25 correlation coefficient. We tried to interpret the results and the meaning of the each correlation. Since we had several results and correlation does not mean causality, we tried to select the meaningfull results having p value smaller than 0.05.
+We interpreted these results and published on our website. But the results should be interpreted carefully since there are limitations in the project.
+
+We also checked the results by grouping the different facts data into groups of countries such as countries having high, medium and low carbondioxide emission rate. This ranking approach did not change our significant correlation results. 
 
 ## Contributions
 Gorkem Camli: choice of datasets, creating the plan for each milestone, exploratory data analysis and attribute description on Now Corpus Data, generating interactive graphs,generating interactive maps, analysis of final results, creating a website that also serves as a platform for the data story, development of project topic, commenting the code, writing the explanations in the notebook, writing the data story, LDA model construction, LDA code implementation and iterative run on clusters,topic selection for each country, correlation analysis. 
